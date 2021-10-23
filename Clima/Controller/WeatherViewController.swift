@@ -8,7 +8,7 @@
 
 import UIKit
 
-class WeatherViewController: UIViewController, UITextFieldDelegate {
+class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManagerDelegate {
 
     @IBOutlet weak var conditionImageView: UIImageView!
     @IBOutlet weak var temperatureLabel: UILabel!
@@ -22,6 +22,8 @@ class WeatherViewController: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        weatherManager.delegate = self
         // 현재 가리키고있는 뷰컨에 알려주는 함수
         searchTextField.delegate = self
 
@@ -60,5 +62,8 @@ class WeatherViewController: UIViewController, UITextFieldDelegate {
         searchTextField.text = ""
     }
     
+    func didUpdateWeather(weather: WeatherModel) {
+        print(weather.temperature)
+    }
 }
 

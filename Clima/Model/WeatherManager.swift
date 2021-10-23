@@ -8,16 +8,23 @@
 
 import Foundation
 
+// Delegate(위임자)를 Protocol로 걸어주어 WeatherModel에 날씨를 업데이트 하도록 위임하는 Delegate
+protocol WeatherManagerDelegate {
+    func didUpdateWeather(weather: WeatherModel)
+}
+
 struct WeatherManager {
     // 개인 API 호출
     // http로 호출하게 되면 누군가 내 appid를 가로 챌수 있기때문에
     // https로 암호화 해서 호출해야 에러가 나지 않음
-    let weatherURL = "your Personal API from https://openweathermap.org/"
+    let weatherURL = "Your Personal API Code"
+    
+    var delegate: WeatherManagerDelegate?
+    
     // 개인 API 호출 키에다가 사용자가 원하는 도시 이름을 호출할 수 있도록 아래와 같이 작성
     func fetchWeather(cityName: String) {
         let urlString = "\(weatherURL)&q=\(cityName)"
         performRequest(urlString: urlString)
-        
     }
     
     func performRequest(urlString: String) {
@@ -32,11 +39,16 @@ struct WeatherManager {
             // let task = session.dataTask(with: url, completionHandler: handler(data:response:error:))
             let task = session.dataTask(with: url) { data, response, error in
                 if error != nil {
-                    print(error)
+                    print(error!)
                     return
                 }
                 if let safeData = data {
-                    self.parseJSON(weatherData: safeData)
+                    if let weather = self.parseJSON(weatherData: safeData) {
+                        // 데이터가 안전하게 바인딩이 되면 weather 변수가 업데이트 될 수 있도록 알려줌
+                        // 현재 Delegate의 자기 자신이라는 것을 알려주기 위해 self 키워드를 써줌
+                        self.delegate?.didUpdateWeather(weather: weather)
+                        
+                    }
                 }
             }
             // 4. Start the task
@@ -45,17 +57,25 @@ struct WeatherManager {
         }
     }
     
-    func parseJSON(weatherData: Data) {
+    func parseJSON(weatherData: Data) -> WeatherModel? {
         let decoder = JSONDecoder()
         do {
             let decodedData = try decoder.decode(WeatherData.self, from: weatherData)
-            print("\(decodedData.name)의 온도 : \(decodedData.main.temp), 상태 : \(decodedData.weather.description)")
+            let id = decodedData.weather[0].id
+            let temp = decodedData.main.temp
+            let name = decodedData.name
             
+            let weather = WeatherModel(conditionId: id, cityName: name, temperature: temp)
+            return weather
+            
+            print(weather.temperatureString)
+            
+//            print("\(decodedData.name)의 온도 : \(decodedData.main.temp), 상태 : \(decodedData.weather.description)")
         } catch {
             print(error)
+            return nil
         }
     }
-    
     
 }
 
