@@ -18,7 +18,7 @@ Overview : Coinapi.io의 데이터 중 rate를 가져와 나라별 통화에 맞
 - **Feature**
   * Coinapi.io 필요한 데이터 호출
   * Delegate Pattern 적용
-  * protocol 분리하여 코드 refactoring 진행   
+  * protocol Datasource와 Delegate를 분리하여 extension으로 코드 refactoring 진행   
 
 <img src = "https://user-images.githubusercontent.com/47841046/139540122-68190453-397c-4041-bfd7-da1dc21c8dd7.gif" width = "25%" heigth = "25%"></img><br/>
 
